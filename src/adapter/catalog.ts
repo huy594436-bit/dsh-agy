@@ -19,11 +19,12 @@ export interface CatalogModel {
   /** Level-thinking: 'level' means single id + selectable low/medium/high via thinkingLevel. Omit = level bound to id. */
   thinking?: 'level'
   /** The reasoning levels this model exposes when thinking is 'level' (default: low/medium/high). */
-  thinkingLevels?: readonly ('low' | 'medium' | 'high')[]
+  thinkingLevels?: readonly ('low' | 'medium' | 'high' | 'xhigh')[]
 }
 
 export const AGY_PUBLIC_MODELS: readonly CatalogModel[] = [
   { id: 'gemini-4-argon', name: 'Gemini 4 Argon', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level' },
+  { id: 'gemini-4-hydrogen', name: 'Gemini 4 Hydrogen', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level', thinkingLevels: ['low', 'medium', 'high', 'xhigh'] as const },
   { id: 'claude-opus-5-5', name: 'Claude Opus 5.5', contextLength: 200000, maxOutputTokens: 64000, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level' },
   { id: 'claude-sonnet-5-5', name: 'Claude Sonnet 5.5', contextLength: 200000, maxOutputTokens: 64000, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level' },
   { id: 'gemini-3.8-flash-tiered', name: 'Gemini 3.8 Flash', contextLength: 1048576, maxOutputTokens: 65536, supportsReasoning: true, supportsVision: true, toolCalling: true, thinking: 'level', thinkingLevels: ['low', 'medium', 'high'] as const },
@@ -155,6 +156,7 @@ export function registerDiscoveredUnifiedThinkingFamily(baseId: string): void {
 export function isUnifiedThinkingFamily(modelId: string): boolean {
   return (
     modelId === 'gemini-4-argon' ||
+    modelId === 'gemini-4-hydrogen' ||
     modelId === 'claude-opus-5-5' ||
     modelId === 'claude-sonnet-5-5' ||
     DISCOVERED_UNIFIED_THINKING_FAMILIES.has(modelId)
@@ -189,7 +191,7 @@ export function isLevelThinkingModel(modelId: string): boolean {
  * Flash family exposes low/medium/high; Pro family exposes low/high only
  * (measured: Pro models reject medium thinking levels).
  */
-export function levelThinkingEffortsFor(modelId: string): readonly ('low' | 'medium' | 'high')[] {
+export function levelThinkingEffortsFor(modelId: string): readonly ('low' | 'medium' | 'high' | 'xhigh')[] {
   const cat = catalogModel(modelId)
   if (cat?.thinkingLevels) return cat.thinkingLevels
   const family = DISCOVERED_TIERED_FAMILIES.get(modelId)
